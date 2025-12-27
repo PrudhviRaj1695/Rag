@@ -1,6 +1,6 @@
 from azure.search.documents import SearchClient
 from azure.core.credentials import AzureKeyCredential
-from app.config import (
+from backend.app.config import (
     AZURE_SEARCH_ENDPOINT,
     AZURE_SEARCH_INDEX,
     AZURE_SEARCH_KEY,

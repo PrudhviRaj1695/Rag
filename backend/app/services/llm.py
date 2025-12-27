@@ -1,5 +1,5 @@
 from openai import AzureOpenAI
-from app.config import (
+from backend.app.config import (
     AZURE_OPENAI_DEPLOYMENT,
     AZURE_OPENAI_ENDPOINT,
     AZURE_OPENAI_API_KEY,

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.services.rag_service import run_rag
-from app.models.request import ChatRequest
+from backend.app.services.rag_service import run_rag
+from backend.app.models.request import ChatRequest
 
 router = APIRouter()
 

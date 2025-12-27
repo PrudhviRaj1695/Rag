@@ -1,5 +1,5 @@
-from app.services.retriever import retrieve_chunks
-from app.services.llm import ask_llm
+from backend.app.services.retriever import retrieve_chunks
+from backend.app.services.llm import ask_llm
 
 async def run_rag(query: str):
     documents = retrieve_chunks(query)

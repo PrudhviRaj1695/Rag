@@ -1,47 +1,63 @@
 import streamlit as st
 import requests
+from util.logger import logger
 
-# --------------------------------------
-# App Config
-# --------------------------------------
+# ------------------------------
+# Config
+# ------------------------------
+BACKEND_URL = "http://localhost:8000/chat/chat"
+
 st.set_page_config(
-    page_title="RAG Document Assistant",
+    page_title="RAG Assistant",
+    page_icon="🤖",
     layout="centered"
 )
+
+logger.INFO("Starting RAG frontend")
 
 st.title("📄 Document Q&A Assistant")
 st.caption("Ask questions from your uploaded documents")
 
-BACKEND_URL = "http://127.0.0.1:8000/chat/chat"
+# Session state for chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# --------------------------------------
-# Input Box
-# --------------------------------------
-query = st.text_input("Ask a question:", placeholder="e.g. What is the policy coverage?")
+# Display chat history
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-# --------------------------------------
-# Submit Button
-# --------------------------------------
-if st.button("Ask") and query.strip():
+# User input
+query = st.chat_input("Ask a question about your document...")
 
-    with st.spinner("Thinking..."):
-        response = requests.post(
-            BACKEND_URL,
-            json={"query": query},
-            stream=True
-        )
+if query:
+    # Show user message
+    st.session_state.messages.append({"role": "user", "content": query})
+    with st.chat_message("user"):
+        st.markdown(query)
 
-        answer_placeholder = st.empty()
-        full_response = ""
+    # Call backend
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            response = requests.post(
+                BACKEND_URL,
+                json={"query": query}
+            )
 
-        for chunk in response.iter_content(chunk_size=None):
-            if chunk:
-                text = chunk.decode("utf-8")
-                full_response += text
-                answer_placeholder.markdown(full_response)
+            data = response.json()
 
-# --------------------------------------
-# Footer
-# --------------------------------------
-st.markdown("---")
-st.caption("Powered by Azure OpenAI + RAG")
+            answer = data.get("answer", "No answer found.")
+            sources = data.get("sources", [])
+
+            st.markdown(answer)
+
+            if sources:
+                st.markdown("---")
+                st.caption("Sources:")
+                for s in sources:
+                    st.markdown(f"- **{s['source']}** (page {s['page']})")
+
+    # Save to chat history
+    st.session_state.messages.append(
+        {"role": "assistant", "content": answer}
+    )
