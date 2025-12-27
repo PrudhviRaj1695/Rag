@@ -22,9 +22,10 @@ def retrieve_chunks(query: str, top_k: int = 5):
     results = search_client.search(
         search_text=query,
         top=top_k,
-        query_type="semantic",
+        query_type="semantic",                     # 🔥 enables semantic reranking
         semantic_configuration_name="default",
-        select=["content", "page", "source"]
+        query_caption="extractive",
+        query_answer="extractive",
     )
 
     documents = []
